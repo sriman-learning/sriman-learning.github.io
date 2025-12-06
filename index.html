@@ -1,11 +1,259 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Welcome to Sriman Learning</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sriman's 15-Month AI Architect Journey</title>
+    <style>
+        :root {
+            --primary: #2563eb; /* Blue */
+            --success: #16a34a; /* Green */
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text: #1e293b;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        h1 { margin-bottom: 10px; }
+        
+        /* Progress Bar Styles */
+        .progress-section {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 20px;
+            z-index: 100;
+            margin-bottom: 30px;
+        }
+
+        .progress-bar-bg {
+            background-color: #e2e8f0;
+            height: 20px;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            background-color: var(--success);
+            height: 100%;
+            width: 0%; /* JS will change this */
+            transition: width 0.5s ease-in-out;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+
+        /* Trimester Card Styles */
+        .trimester {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            border-left: 5px solid var(--primary);
+        }
+
+        .trimester h2 { margin-top: 0; color: var(--primary); }
+        .dates { color: #64748b; font-size: 0.9em; margin-bottom: 15px; display: block; }
+
+        .task-list { list-style: none; padding: 0; }
+
+        .task-item {
+            display: flex;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .task-item:last-child { border-bottom: none; }
+
+        /* Custom Checkbox */
+        input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            margin-right: 15px;
+            cursor: pointer;
+            accent-color: var(--success);
+        }
+
+        label { cursor: pointer; flex: 1; }
+        
+        .completed-text {
+            text-decoration: line-through;
+            color: #94a3b8;
+        }
+    </style>
 </head>
 <body>
-  <h1>Hello, I'm Sriman!</h1>
-  <p>Welcome to my page. Here you will find path I have chosen for myself to learn machine learning.</p>
-  <p>You will find my notes, projects, and ideas explained intuitively.</p>
+
+<div class="container">
+    <header>
+        <h1>My 15-Month AI Architect Roadmap 🧠</h1>
+        <p>From Engineering to Bayesian Deep Learning & RL</p>
+    </header>
+
+    <div class="progress-section">
+        <div class="progress-bar-bg">
+            <div id="progressBar" class="progress-bar-fill"></div>
+        </div>
+        <div class="stats">
+            <span id="progressText">0% Complete</span>
+            <span id="taskCount">0/0 Tasks</span>
+        </div>
+    </div>
+
+    <div id="roadmap">
+        </div>
+</div>
+
+<script>
+    // 1. The Data: Your 15-Month "Completionist" Plan
+    const roadmapData = [
+        {
+            title: "Trimester 1: The Bayesian Foundation",
+            dates: "Months 1-3",
+            tasks: [
+                "Read 'Think Bayes' (Downey) 📘",
+                "Read 'Statistical Rethinking' (McElreath) 🦉",
+                "Code Challenge: Build a Causal Graph & PyMC Model"
+            ]
+        },
+        {
+            title: "Trimester 2: Classical Machine Learning",
+            dates: "Months 4-6",
+            tasks: [
+                "Read 'Bishop PRML' (Full Book) 📕",
+                "Read 'Murphy Intro' (Ch 18 - Trees Only) 🌳",
+                "Builder Check: Code Random Forest from scratch"
+            ]
+        },
+        {
+            title: "Trimester 3: Deep Learning Foundations",
+            dates: "Months 7-9",
+            tasks: [
+                "Read 'Bishop DL Foundations' (Foundations & CNNs) 🧠",
+                "Master Backpropagation & Optimization",
+                "Builder Check: Build a CNN for Image Classification"
+            ]
+        },
+        {
+            title: "Trimester 4: Generative AI & LLMs",
+            dates: "Months 10-12",
+            tasks: [
+                "Read 'Bishop DL Foundations' (Generative & Transformers) 🤖",
+                "Read 'Build an LLM' (Raschka) 🏗️",
+                "Builder Check: Train a GPT model on personal data"
+            ]
+        },
+        {
+            title: "Trimester 5: Reinforcement Learning",
+            dates: "Months 13-15",
+            tasks: [
+                "Read 'Grokking Deep RL' (Morales) 🎮",
+                "Read 'Sutton & Barto' (Full Book) 🐜",
+                "Builder Check: Train an RL Agent (Deep Q-Learning)"
+            ]
+        }
+    ];
+
+    const roadmapContainer = document.getElementById('roadmap');
+    const progressBar = document.getElementById('progressBar');
+    const progressText = document.getElementById('progressText');
+    const taskCount = document.getElementById('taskCount');
+
+    // 2. Load saved progress from Local Storage
+    let savedProgress = JSON.parse(localStorage.getItem('mlRoadmapProgress')) || {};
+
+    // 3. Render the Roadmap
+    let totalTasks = 0;
+    
+    roadmapData.forEach((trimester, tIndex) => {
+        const section = document.createElement('div');
+        section.className = 'trimester';
+        
+        let tasksHtml = '';
+        trimester.tasks.forEach((task, iIndex) => {
+            const taskId = `t${tIndex}_task${iIndex}`;
+            const isChecked = savedProgress[taskId] ? 'checked' : '';
+            const textClass = savedProgress[taskId] ? 'completed-text' : '';
+            
+            tasksHtml += `
+                <li class="task-item">
+                    <input type="checkbox" id="${taskId}" ${isChecked} onchange="toggleTask('${taskId}')">
+                    <label for="${taskId}" id="label_${taskId}" class="${textClass}">${task}</label>
+                </li>
+            `;
+            totalTasks++;
+        });
+
+        section.innerHTML = `
+            <h2>${trimester.title}</h2>
+            <span class="dates">${trimester.dates}</span>
+            <ul class="task-list">
+                ${tasksHtml}
+            </ul>
+        `;
+        roadmapContainer.appendChild(section);
+    });
+
+    // 4. Update Progress Function
+    function updateStats() {
+        const completed = Object.keys(savedProgress).filter(k => savedProgress[k]).length;
+        const percent = Math.round((completed / totalTasks) * 100);
+        
+        progressBar.style.width = `${percent}%`;
+        progressText.innerText = `${percent}% Complete`;
+        taskCount.innerText = `${completed}/${totalTasks} Tasks`;
+    }
+
+    // 5. Handle Checkbox Clicks
+    window.toggleTask = function(id) {
+        const checkbox = document.getElementById(id);
+        const label = document.getElementById(`label_${id}`);
+        
+        // Save status
+        savedProgress[id] = checkbox.checked;
+        localStorage.setItem('mlRoadmapProgress', JSON.stringify(savedProgress));
+        
+        // Update Visuals
+        if(checkbox.checked) {
+            label.classList.add('completed-text');
+        } else {
+            label.classList.remove('completed-text');
+        }
+        
+        updateStats();
+    };
+
+    // Initialize stats on load
+    updateStats();
+
+</script>
+
 </body>
 </html>
