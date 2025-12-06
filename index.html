@@ -29,12 +29,40 @@
 
         header {
             text-align: center;
-            margin-bottom: 40px;
+            margin-bottom: 30px;
         }
 
         h1 { margin-bottom: 10px; }
+
+        /* --- NEW: Daily Streak Section --- */
+        .streak-card {
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2);
+        }
+
+        .streak-count { font-size: 2.5em; font-weight: bold; display: block; }
         
-        /* Progress Bar Styles */
+        .streak-btn {
+            background: white;
+            color: var(--primary);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: transform 0.1s;
+        }
+
+        .streak-btn:active { transform: scale(0.95); }
+        .streak-btn:disabled { opacity: 0.7; cursor: not-allowed; }
+
+        /* Progress Bar */
         .progress-section {
             background: var(--card-bg);
             padding: 20px;
@@ -56,7 +84,7 @@
         .progress-bar-fill {
             background-color: var(--success);
             height: 100%;
-            width: 0%; /* JS will change this */
+            width: 0%;
             transition: width 0.5s ease-in-out;
         }
 
@@ -90,9 +118,6 @@
             border-bottom: 1px solid #f1f5f9;
         }
 
-        .task-item:last-child { border-bottom: none; }
-
-        /* Custom Checkbox */
         input[type="checkbox"] {
             width: 20px;
             height: 20px;
@@ -101,8 +126,17 @@
             accent-color: var(--success);
         }
 
-        label { cursor: pointer; flex: 1; }
+        .task-content { flex: 1; display: flex; flex-direction: column; }
         
+        .task-link {
+            font-size: 0.85em;
+            color: var(--primary);
+            text-decoration: none;
+            margin-top: 2px;
+        }
+        
+        .task-link:hover { text-decoration: underline; }
+
         .completed-text {
             text-decoration: line-through;
             color: #94a3b8;
@@ -114,8 +148,14 @@
 <div class="container">
     <header>
         <h1>My 15-Month AI Architect Roadmap 🧠</h1>
-        <p>From Engineering to Bayesian Deep Learning & RL</p>
     </header>
+
+    <div class="streak-card">
+        <div>Current Streak 🔥</div>
+        <span id="streakDisplay" class="streak-count">0 Days</span>
+        <button id="streakBtn" class="streak-btn" onclick="logDailyStudy()">I Studied Today!</button>
+        <div id="lastStudyMsg" style="font-size: 0.8em; margin-top: 5px; opacity: 0.9;"></div>
+    </div>
 
     <div class="progress-section">
         <div class="progress-bar-bg">
@@ -127,56 +167,56 @@
         </div>
     </div>
 
-    <div id="roadmap">
-        </div>
+    <div id="roadmap"></div>
 </div>
 
 <script>
-    // 1. The Data: Your 15-Month "Completionist" Plan
+    // 1. The Data: Updated to support LINKS
+    // REPLACE '#' with your real GitHub links (e.g., "https://github.com/sriman/notes/blob/main/chapter1.ipynb")
     const roadmapData = [
         {
             title: "Trimester 1: The Bayesian Foundation",
             dates: "Months 1-3",
             tasks: [
-                "Read 'Think Bayes' (Downey) 📘",
-                "Read 'Statistical Rethinking' (McElreath) 🦉",
-                "Code Challenge: Build a Causal Graph & PyMC Model"
+                { name: "Read 'Think Bayes' (Downey) 📘", link: "#" },
+                { name: "Read 'Statistical Rethinking' (McElreath) 🦉", link: "#" },
+                { name: "Code Challenge: Build a Causal Graph & PyMC Model", link: "#" }
             ]
         },
         {
             title: "Trimester 2: Classical Machine Learning",
             dates: "Months 4-6",
             tasks: [
-                "Read 'Bishop PRML' (Full Book) 📕",
-                "Read 'Murphy Intro' (Ch 18 - Trees Only) 🌳",
-                "Builder Check: Code Random Forest from scratch"
+                { name: "Read 'Bishop PRML' (Full Book) 📕", link: "#" },
+                { name: "Read 'Murphy Intro' (Ch 18 - Trees Only) 🌳", link: "#" },
+                { name: "Builder Check: Code Random Forest from scratch", link: "#" }
             ]
         },
         {
             title: "Trimester 3: Deep Learning Foundations",
             dates: "Months 7-9",
             tasks: [
-                "Read 'Bishop DL Foundations' (Foundations & CNNs) 🧠",
-                "Master Backpropagation & Optimization",
-                "Builder Check: Build a CNN for Image Classification"
+                { name: "Read 'Bishop DL Foundations' (Foundations & CNNs) 🧠", link: "#" },
+                { name: "Master Backpropagation & Optimization", link: "#" },
+                { name: "Builder Check: Build a CNN for Image Classification", link: "#" }
             ]
         },
         {
             title: "Trimester 4: Generative AI & LLMs",
             dates: "Months 10-12",
             tasks: [
-                "Read 'Bishop DL Foundations' (Generative & Transformers) 🤖",
-                "Read 'Build an LLM' (Raschka) 🏗️",
-                "Builder Check: Train a GPT model on personal data"
+                { name: "Read 'Bishop DL Foundations' (Generative & Transformers) 🤖", link: "#" },
+                { name: "Read 'Build an LLM' (Raschka) 🏗️", link: "#" },
+                { name: "Builder Check: Train a GPT model on personal data", link: "#" }
             ]
         },
         {
             title: "Trimester 5: Reinforcement Learning",
             dates: "Months 13-15",
             tasks: [
-                "Read 'Grokking Deep RL' (Morales) 🎮",
-                "Read 'Sutton & Barto' (Full Book) 🐜",
-                "Builder Check: Train an RL Agent (Deep Q-Learning)"
+                { name: "Read 'Grokking Deep RL' (Morales) 🎮", link: "#" },
+                { name: "Read 'Sutton & Barto' (Full Book) 🐜", link: "#" },
+                { name: "Builder Check: Train an RL Agent (Deep Q-Learning)", link: "#" }
             ]
         }
     ];
@@ -186,10 +226,10 @@
     const progressText = document.getElementById('progressText');
     const taskCount = document.getElementById('taskCount');
 
-    // 2. Load saved progress from Local Storage
+    // Load saved progress
     let savedProgress = JSON.parse(localStorage.getItem('mlRoadmapProgress')) || {};
 
-    // 3. Render the Roadmap
+    // --- RENDER ROADMAP ---
     let totalTasks = 0;
     
     roadmapData.forEach((trimester, tIndex) => {
@@ -197,15 +237,23 @@
         section.className = 'trimester';
         
         let tasksHtml = '';
-        trimester.tasks.forEach((task, iIndex) => {
+        trimester.tasks.forEach((taskObj, iIndex) => {
             const taskId = `t${tIndex}_task${iIndex}`;
             const isChecked = savedProgress[taskId] ? 'checked' : '';
             const textClass = savedProgress[taskId] ? 'completed-text' : '';
             
+            // Logic to show link only if it's not '#'
+            const linkHtml = taskObj.link && taskObj.link !== '#' 
+                ? `<a href="${taskObj.link}" target="_blank" class="task-link">View Notes/Code 🔗</a>` 
+                : `<span style="font-size:0.8em; color:#94a3b8;">(No link yet)</span>`;
+
             tasksHtml += `
                 <li class="task-item">
                     <input type="checkbox" id="${taskId}" ${isChecked} onchange="toggleTask('${taskId}')">
-                    <label for="${taskId}" id="label_${taskId}" class="${textClass}">${task}</label>
+                    <div class="task-content">
+                        <label for="${taskId}" id="label_${taskId}" class="${textClass}">${taskObj.name}</label>
+                        ${linkHtml}
+                    </div>
                 </li>
             `;
             totalTasks++;
@@ -221,7 +269,6 @@
         roadmapContainer.appendChild(section);
     });
 
-    // 4. Update Progress Function
     function updateStats() {
         const completed = Object.keys(savedProgress).filter(k => savedProgress[k]).length;
         const percent = Math.round((completed / totalTasks) * 100);
@@ -231,27 +278,82 @@
         taskCount.innerText = `${completed}/${totalTasks} Tasks`;
     }
 
-    // 5. Handle Checkbox Clicks
     window.toggleTask = function(id) {
         const checkbox = document.getElementById(id);
         const label = document.getElementById(`label_${id}`);
-        
-        // Save status
         savedProgress[id] = checkbox.checked;
         localStorage.setItem('mlRoadmapProgress', JSON.stringify(savedProgress));
         
-        // Update Visuals
-        if(checkbox.checked) {
-            label.classList.add('completed-text');
-        } else {
-            label.classList.remove('completed-text');
-        }
+        if(checkbox.checked) label.classList.add('completed-text');
+        else label.classList.remove('completed-text');
         
         updateStats();
     };
 
-    // Initialize stats on load
     updateStats();
+
+    // --- STREAK LOGIC ---
+    // We store: { count: 5, lastLogDate: "2025-12-06" }
+    let streakData = JSON.parse(localStorage.getItem('mlStreak')) || { count: 0, lastLogDate: null };
+    
+    const streakDisplay = document.getElementById('streakDisplay');
+    const streakBtn = document.getElementById('streakBtn');
+    const lastStudyMsg = document.getElementById('lastStudyMsg');
+
+    function updateStreakUI() {
+        streakDisplay.innerText = `${streakData.count} Day Streak`;
+        
+        // Check if already logged today
+        const today = new Date().toDateString();
+        if (streakData.lastLogDate === today) {
+            streakBtn.disabled = true;
+            streakBtn.innerText = "Logged for Today ✅";
+            lastStudyMsg.innerText = "Great job! Come back tomorrow.";
+        } else {
+            streakBtn.disabled = false;
+            streakBtn.innerText = "I Studied Today! 📚";
+            if(streakData.lastLogDate) {
+                lastStudyMsg.innerText = `Last study session: ${streakData.lastLogDate}`;
+            } else {
+                lastStudyMsg.innerText = "Start your streak today!";
+            }
+        }
+    }
+
+    window.logDailyStudy = function() {
+        const today = new Date().toDateString();
+        const yesterday = new Date();
+        yesterday.setDate(yesterday.getDate() - 1);
+        
+        // Logic: If last log was yesterday, increment. If older, reset to 1. If null, set to 1.
+        if (streakData.lastLogDate === yesterday.toDateString()) {
+            streakData.count++;
+        } else if (streakData.lastLogDate !== today) {
+            // Broken streak or first time
+            streakData.count = 1; 
+            // Note: In a strict app we'd reset to 1, but maybe you want to be kind and just increment? 
+            // Let's implement strict streak logic:
+            if(streakData.lastLogDate && new Date(streakData.lastLogDate) < yesterday) {
+                 streakData.count = 1; // Reset if missed a day
+            } else if (!streakData.lastLogDate) {
+                 streakData.count = 1;
+            } else {
+                // If we are here, it means they might be clicking multiple times on same day (handled by button disable)
+                // or some other edge case.
+                streakData.count++; 
+            }
+        }
+        
+        streakData.lastLogDate = today;
+        localStorage.setItem('mlStreak', JSON.stringify(streakData));
+        updateStreakUI();
+        
+        // Fun animation effect
+        streakBtn.style.transform = "scale(1.1)";
+        setTimeout(() => streakBtn.style.transform = "scale(1)", 200);
+    };
+
+    updateStreakUI();
 
 </script>
 
